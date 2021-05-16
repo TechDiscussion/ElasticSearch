@@ -1,5 +1,33 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "https://oss.jfrog.org/jfrog-dependencies"
+        }
+        maven {
+            url "https://repository.apache.org/snapshots"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.org.nosphere.apache:creadur-rat-gradle:0.3.0"
+        classpath group: 'org.hidetake', name: 'gradle-ssh-plugin', version: gradleSshPluginVersion
+        classpath group: 'ru.vyarus', name: 'gradle-mkdocs-plugin', version: gradleMkdocsPluginVersion
+        classpath "org.ajoberstar:grgit:${gradleGitPluginVersion}"
+        classpath "io.franzbecker:gradle-lombok:${gradleLombokPluginVersion}"
+        classpath "com.bmuschko:gradle-tomcat-plugin:${tomcatPluginVersion}"
+    }
+}
+
 plugins {
-    id 'java'
+    id "io.freefair.lombok" version "5.3.0"
+    id 'application'
+}
+
+application {
+    mainClass = 'ElasticSearch.Application'
 }
 
 group 'org.example'
@@ -7,13 +35,48 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+
+    maven {
+        url "https://repository.apache.org/snapshots"
+    }
+    maven {
+        url "https://oss.jfrog.org/jfrog-dependencies"
+    }
+    maven {
+        url "https://jitpack.io"
+    }
 }
+
+apply plugin: 'com.bmuschko.tomcat-base'
+apply plugin: "war"
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.8'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0'
+    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: '6.4.0'
+    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.4.0'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-osgi', version: '1.11.26'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.2'
+    implementation 'com.github.awslabs:aws-request-signing-apache-interceptor:b3772780da'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: springBootVersion
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: springSleuthVersion
+    compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: springMongoDataVersion
+    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: javaMongoDriverVersion
+    compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+    compile group: 'javax.el', name: 'javax.el-api', version: javaxElApiVersion
+    compile group: 'org.glassfish', name: 'javax.el', version: glassfishVersion
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: javaxServletVersion
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
 }
 
-test {
-    useJUnitPlatform()
+task publishAllJars() {
+    dependsOn ':TechVault:publish'
 }

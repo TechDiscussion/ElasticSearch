@@ -28,7 +28,10 @@ public class  Application {
         ESRequestHandler esRequestHandler = new ESRequestHandler();
 
         // Send a bulk create request.
-        esRequestHandler.CreateBulkPostRequest(documents, "test-6", "blog");
+        // esRequestHandler.CreateBulkPostRequest(documents, "test-6", "blog");
+
+        // Delete an index request.
+        esRequestHandler.DeleteIndexRequest("test-6");
 
         // End
         System.out.println("Good Bye!");

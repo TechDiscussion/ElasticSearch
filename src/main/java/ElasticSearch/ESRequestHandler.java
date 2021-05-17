@@ -4,6 +4,7 @@ import com.amazonaws.auth.AWS4Signer;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -14,6 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import com.amazonaws.http.AWSRequestSigningApacheInterceptor;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
+import org.elasticsearch.ElasticsearchException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,8 +61,24 @@ public class ESRequestHandler {
         DecodeBulkResponseForPost(esClient.bulk(bulk_request, RequestOptions.DEFAULT));
     }
 
+    // Delete given index.
+    public static void DeleteIndexRequest(String index) {
+        try {
+            DeleteIndexRequest request = new DeleteIndexRequest(index);
+            esClient.indices().delete(request, RequestOptions.DEFAULT);
+            System.out.println("Deletion success");
+        } catch (ElasticsearchException | IOException exception) {
+            if (exception.getClass().equals(ElasticsearchException.class)) {
+                System.out.println("ElasticsearchException");
+            } else {
+                System.out.println("IOException");
+            }
+            // exception.printStackTrace();
+        }
+    }
+
     // Decodes BulkResponse.
-    public static void DecodeBulkResponseForPost(BulkResponse bulkResponse) {
+    private static void DecodeBulkResponseForPost(BulkResponse bulkResponse) {
         int totalCreates = 0;
         int totalUpdates = 0;
         int totalRequests = 0;
